@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
+import axios from "axios";
 import {
   Bot,
   X,
@@ -9,7 +10,6 @@ import {
 
 import MessageBubble from "./MessageBubble";
 import TypingIndicator from "./TypingIndicator";
-import API from "../../utils/api"; // ✅ USE SHARED API INSTANCE
 
 /* ---------- Styles ---------- */
 
@@ -132,17 +132,12 @@ Ask me about workouts, calories, or recovery.`,
     if (!input.trim()) return;
 
     const userText = input;
-
-    setMessages((prev) => [
-      ...prev,
-      { sender: "user", text: userText },
-    ]);
-
+    setMessages((prev) => [...prev, { sender: "user", text: userText }]);
     setInput("");
     setTyping(true);
 
     try {
-      const res = await API.post("/api/chat", {
+      const res = await axios.post("http://localhost:8080/api/chat", {
         message: userText,
         user: { _id: user?._id },
       });
@@ -151,7 +146,7 @@ Ask me about workouts, calories, or recovery.`,
         ...prev,
         { sender: "bot", text: res.data.reply },
       ]);
-    } catch (error) {
+    } catch (err) {
       setMessages((prev) => [
         ...prev,
         {
