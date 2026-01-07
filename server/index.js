@@ -17,7 +17,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173", 
-      "https://fit-track-hqya-62fpt1u8w-shikhar-rastogis-projects-694dda53.vercel.app", 
+      "https://fit-track-hqya-6fw64fd6o-shikhar-rastogis-projects-694dda53.vercel.app", 
     ],
     credentials: true,
   })
