@@ -29,6 +29,7 @@ const Container = styled.div`
 `;
 
 function App() {
+  console.log("VITE_API_URL (from build):", import.meta.env.VITE_API_URL);
   const { currentUser } = useSelector((state) => state.user);
   const [chatOpen, setChatOpen] = useState(false);
 
