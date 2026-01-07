@@ -21,12 +21,9 @@ export const getDashboardDetails = (token) =>
 
 // ---------- Workouts ----------
 export const getWorkouts = (token, date = "") =>
-  API.get(
-    `/api/user/workout${date ? `?date=${date}` : ""}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
+  API.get(`/api/user/workout${date ? `?date=${date}` : ""}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
 export const addWorkout = (token, data) =>
   API.post("/api/user/workout", data, {
