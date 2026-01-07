@@ -2,22 +2,47 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const mongoose = require("mongoose");
+
 const UserRoutes = require("./routes/User.js");
 const ChatRoutes = require("./routes/chat.js");
-
 
 dotenv.config();
 
 const app = express();
-app.use(cors());
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: true })); // for form data
 
-app.use("/api/user/", UserRoutes);
+/* ===================== MIDDLEWARE ===================== */
+
+// ✅ CORS (Frontend on Vercel + Local Dev)
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173", 
+      "https://fit-track-hqya-62fpt1u8w-shikhar-rastogis-projects-694dda53.vercel.app", 
+    ],
+    credentials: true,
+  })
+);
+
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true }));
+
+/* ===================== ROUTES ===================== */
+
+app.use("/api/user", UserRoutes);
 app.use("/api/chat", ChatRoutes);
 
+// Health check (VERY IMPORTANT for Render testing)
+app.get("/api/health", (req, res) => {
+  res.status(200).json({ status: "OK" });
+});
 
-// Error handler middleware
+// Root route
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "Server running" });
+});
+
+/* ===================== ERROR HANDLER ===================== */
+
 app.use((err, req, res, next) => {
   const status = err.status || 500;
   const message = err.message || "Something went wrong";
@@ -28,31 +53,29 @@ app.use((err, req, res, next) => {
   });
 });
 
-app.get("/", async (req, res) => {
-  res.status(200).json({
-    message: "Hello",
-  });
-});
+/* ===================== DATABASE ===================== */
 
-const connectDB = () => {
-  mongoose.set("strictQuery", true);
-  mongoose
-    .connect(process.env.MONGODB_URL)
-    .then(() => console.log("Connected to MongoDB"))
-    .catch((err) => {
-      console.error("Failed to connect with MongoDB");
-      console.error(err);
-    });
+const connectDB = async () => {
+  try {
+    mongoose.set("strictQuery", true);
+    await mongoose.connect(process.env.MONGODB_URL);
+    console.log("✅ MongoDB Connected");
+  } catch (error) {
+    console.error("❌ MongoDB connection failed");
+    console.error(error);
+    process.exit(1);
+  }
 };
 
-const startServer = async () => {
-  try {
-    connectDB();
-    app.listen(8080, () => console.log("Server started on port 8080"));
+/* ===================== SERVER START ===================== */
 
-  } catch (error) {
-    console.log(error);
-  }
+const PORT = process.env.PORT || 8080;
+
+const startServer = async () => {
+  await connectDB();
+  app.listen(PORT, () =>
+    console.log(`🚀 Server running on port ${PORT}`)
+  );
 };
 
 startServer();
